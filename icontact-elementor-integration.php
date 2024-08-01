@@ -13,3 +13,32 @@
  * Text Domain: icontact-elementor-integration
  * Domain Path: /languages
  */
+
+
+//Avoiding Direct File Access
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+class WPIEI_Core
+{
+	private static $instance;
+
+
+	private static function get_instance(){
+		if (null === self::$instance){
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+
+	public function __construct(){
+		
+	}
+}
+
+
+WPIEI_Core::get_instance();
