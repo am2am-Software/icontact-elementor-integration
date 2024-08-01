@@ -26,7 +26,7 @@ class WPIEI_Core
 	private static $instance;
 
 
-	private static function get_instance(){
+	public static function get_instance(){
 		if (null === self::$instance){
 			self::$instance = new self();
 		}
@@ -36,7 +36,14 @@ class WPIEI_Core
 
 
 	public function __construct(){
-		
+		add_action( 'elementor_pro/forms/actions/register', [$this, 'register_action'] );
+	}
+
+
+	public function register_action( $form_actions ){
+		require_once( __DIR__ . '/inc/actions/icontact.php' );
+
+		$form_actions->register( new \WPIEI_iContact() );
 	}
 }
 
