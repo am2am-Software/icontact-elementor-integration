@@ -1,9 +1,13 @@
 <?php
 
 use \Elementor\Controls_Manager;
+use \ElementorPro\Modules\Forms\Classes\Action_Base;
 
-class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
+class WPIEI_iContact extends Action_Base
 {
+	const OPTION_NAME = 'icontact_api';
+
+
 	public function get_name(){
 		return 'icontact';
 	}
@@ -16,7 +20,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 
 	public function register_settings_section( $widget ) {
 		$widget->start_controls_section(
-			'icontact_api_section',
+			self::OPTION_NAME .'_section',
 			[
 				'label' => esc_html__( 'iContact API', 'icontact-elementor-integration' ),
 				'condition' => [
@@ -26,7 +30,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_appid',
+			self::OPTION_NAME .'_appid',
 			[
 				'label' => esc_html__( 'Application ID', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -34,7 +38,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_username',
+			self::OPTION_NAME .'_username',
 			[
 				'label' => esc_html__( 'Username / Email', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -42,7 +46,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_password',
+			self::OPTION_NAME .'_password',
 			[
 				'label' => esc_html__( 'Password', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -50,7 +54,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_url',
+			self::OPTION_NAME .'_url',
 			[
 				'label' => esc_html__( 'API URL', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::URL,
@@ -58,7 +62,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_field_email',
+			self::OPTION_NAME .'_field_email',
 			[
 				'label' => esc_html__( 'Email Field ID', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -66,7 +70,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_field_name',
+			self::OPTION_NAME .'_field_name',
 			[
 				'label' => esc_html__( 'Name Field ID', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -74,7 +78,7 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		);
 
 		$widget->add_control(
-			'icontact_api_list_id',
+			self::OPTION_NAME .'_list_id',
 			[
 				'label' => esc_html__( 'List ID', 'icontact-elementor-integration' ),
 				'type' => Controls_Manager::TEXT,
@@ -89,12 +93,12 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 		$settings = $record->get( 'form_settings' );
 
 		if(
-			empty($settings['icontact_api_appid']) ||
-			empty($settings['icontact_api_username']) ||
-			empty($settings['icontact_api_password']) ||
-			empty($settings['icontact_api_url']) ||
-			empty($settings['icontact_api_field_email']) ||
-			empty($settings['icontact_api_list_id'])
+			empty($settings[self::OPTION_NAME .'_appid']) ||
+			empty($settings[self::OPTION_NAME .'_username']) ||
+			empty($settings[self::OPTION_NAME .'_password']) ||
+			empty($settings[self::OPTION_NAME .'_url']) ||
+			empty($settings[self::OPTION_NAME .'_field_email']) ||
+			empty($settings[self::OPTION_NAME .'_list_id'])
 		){
 			return;
 		}
@@ -110,22 +114,22 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 			'API-Version' => '2.2',
-			'API-AppId' => $settings['icontact_api_appid'],
-			'API-Username' => $settings['icontact_api_username'],
-			'API-Password' => $settings['icontact_api_password']
+			'API-AppId' => $settings[self::OPTION_NAME .'_appid'],
+			'API-Username' => $settings[self::OPTION_NAME .'_username'],
+			'API-Password' => $settings[self::OPTION_NAME .'_password']
 		];
 
-		$firstname = empty($settings['icontact_api_field_name']) ? '' : $fields[$settings['icontact_api_field_name']];
+		$firstname = empty($settings[self::OPTION_NAME .'_field_name']) ? '' : $fields[$settings[self::OPTION_NAME .'_field_name']];
 
 		$icontact_data = [
 			[
-				'email' => $fields[$settings['icontact_api_field_email']],
+				'email' => $fields[$settings[self::OPTION_NAME .'_field_email']],
 				'firstName' => $firstname
 			]
 		];
 
 		$response = wp_remote_post(
-			$settings['icontact_api_url']['url'] . 'contacts/',
+			$settings[self::OPTION_NAME .'_url']['url'] . 'contacts/',
 			[
 				'headers' => $icontact_headers,
 				'body' => wp_json_encode($icontact_data)
@@ -143,13 +147,13 @@ class WPIEI_iContact extends \ElementorPro\Modules\Forms\Classes\Action_Base
 				foreach( $data['contacts'] as $contact ){
 					if( isset( $contact['contactId'] ) ){
 						$res = wp_remote_post(
-							$settings['icontact_api_url']['url'] . 'subscriptions/',
+							$settings[self::OPTION_NAME .'_url']['url'] . 'subscriptions/',
 							[
 								'headers' => $icontact_headers,
 								'body' => wp_json_encode([
 									[
 										'contactId' => $contact['contactId'],
-										'listId' => $settings['icontact_api_list_id'],
+										'listId' => $settings[self::OPTION_NAME .'_list_id'],
 										'status' => 'normal'
 									]
 								]),
