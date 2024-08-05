@@ -173,6 +173,15 @@ class WPIEI_iContact extends Action_Base
 
 
 	public function on_export( $element ) {
+		unset(
+			$element[self::OPTION_NAME .'_appid'],
+			$element[self::OPTION_NAME .'_username'],
+			$element[self::OPTION_NAME .'_password'],
+			$element[self::OPTION_NAME .'_url'],
+			$element[self::OPTION_NAME .'_field_email'],
+			$element[self::OPTION_NAME .'_list_id']
+		);
 
+		return $element;
 	}
 }
